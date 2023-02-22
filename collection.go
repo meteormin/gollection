@@ -9,6 +9,7 @@ import (
 type Collection[T interface{}] interface {
 	Items() []T
 	All() []T
+	Copy() Collection[T]
 	Count() int
 	IsEmpty() bool
 	Add(item T)
@@ -24,6 +25,8 @@ type Collection[T interface{}] interface {
 	First() (*T, error)
 	Last() (*T, error)
 	Merge(merge []T) Collection[T]
+	Slice(start int, end int) Collection[T]
+	Reverse() Collection[T]
 }
 
 // BaseCollection base collection struct
@@ -34,8 +37,10 @@ type BaseCollection[T interface{}] struct {
 
 // NewCollection create collection struct implements Collection interface
 func NewCollection[T interface{}](items []T) Collection[T] {
+	copyItems := make([]T, len(items))
+	copy(copyItems, items)
 	return &BaseCollection[T]{
-		items: items,
+		items: copyItems,
 	}
 }
 
@@ -46,12 +51,11 @@ func (b *BaseCollection[T]) Items() []T {
 
 // All get All items
 func (b *BaseCollection[T]) All() []T {
-	all := make([]T, b.Count())
-	for _, v := range b.items {
-		all = append(all, v)
-	}
+	return slice.Copy(b.items)
+}
 
-	return all
+func (b *BaseCollection[T]) Copy() Collection[T] {
+	return NewCollection(slice.Copy(b.items))
 }
 
 // Count get items count
@@ -71,25 +75,25 @@ func (b *BaseCollection[T]) Add(item T) {
 
 // Map items in collection
 func (b *BaseCollection[T]) Map(fn func(v T, i int) T) Collection[T] {
-	items := slice.Map(b.items, fn)
+	items := slice.Map(b.All(), fn)
 	return NewCollection(items)
 }
 
 // Filter items in collection
 func (b *BaseCollection[T]) Filter(fn func(v T, i int) bool) Collection[T] {
-	filtered := slice.Filter(b.items, fn)
+	filtered := slice.Filter(b.All(), fn)
 	return NewCollection(filtered)
 }
 
 // Except items in collection
 func (b *BaseCollection[T]) Except(fn func(v T, i int) bool) Collection[T] {
-	excepts := slice.Except(b.items, fn)
+	excepts := slice.Except(b.All(), fn)
 	return NewCollection(excepts)
 }
 
 // Chunk items in collection
 func (b *BaseCollection[T]) Chunk(chunkSize int, fn func(v []T, i int)) [][]T {
-	return slice.Chunk(b.items, chunkSize, fn)
+	return slice.Chunk(b.All(), chunkSize, fn)
 }
 
 // For loop items in collection
@@ -132,7 +136,7 @@ func (b *BaseCollection[T]) First() (*T, error) {
 		return nil, errors.New("this collection is empty")
 	}
 
-	first := slice.First(b.items)
+	first := slice.First(b.All())
 	return &first, nil
 }
 
@@ -141,12 +145,18 @@ func (b *BaseCollection[T]) Last() (*T, error) {
 		return nil, errors.New("this collection is empty")
 	}
 
-	last := slice.Last(b.items)
+	last := slice.Last(b.All())
 	return &last, nil
 }
 
 func (b *BaseCollection[T]) Merge(merge []T) Collection[T] {
-	items := b.items
-	items = slice.Merge(items, merge)
-	return NewCollection(items)
+	return NewCollection(slice.Merge(b.All(), merge))
+}
+
+func (b *BaseCollection[T]) Slice(start int, end int) Collection[T] {
+	return NewCollection(slice.Slice(b.All(), start, end))
+}
+
+func (b *BaseCollection[T]) Reverse() Collection[T] {
+	return NewCollection(slice.Reverse(b.All()))
 }

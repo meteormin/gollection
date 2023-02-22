@@ -1,5 +1,13 @@
 package slice
 
+import "math"
+
+func Copy[T interface{}](s []T) []T {
+	copyS := make([]T, len(s))
+	copy(copyS, s)
+	return copyS
+}
+
 func Map[T interface{}](s []T, fn func(v T, i int) T) []T {
 	var mapped []T
 
@@ -39,28 +47,23 @@ func Except[T interface{}](s []T, fn func(v T, i int) bool) []T {
 func Chunk[T interface{}](s []T, chunkSize int, fn ...func(v []T, i int)) [][]T {
 	chunkSlice := make([]T, 0)
 	chunkedSlice := make([][]T, 0)
+	chunkedSize := int(math.Ceil(float64(len(s) / chunkSize)))
 
-	chunkedIndex := 0
-	for _, v := range s {
-		chunkSlice = append(chunkSlice, v)
-
-		if chunkSize == len(chunkSlice) {
-			if len(fn) != 0 {
-				fn[0](chunkSlice, chunkedIndex)
-			}
-
-			chunkedSlice = append(chunkedSlice, chunkSlice)
-			chunkedIndex++
-
-			chunkSlice = make([]T, 0)
-		}
+	var callback func(v []T, i int)
+	if len(fn) != 0 {
+		callback = fn[0]
 	}
 
-	if len(chunkSlice) != 0 {
-		if len(fn) != 0 {
-			fn[0](chunkSlice, chunkedIndex)
-			chunkedSlice = append(chunkedSlice, chunkSlice)
+	for i := 0; i < chunkedSize; i++ {
+		if (i*chunkSize)+chunkSize <= (len(s) - 1) {
+			chunkSlice = s[(i * chunkSize) : (i*chunkSize)+chunkSize]
+		} else {
+			chunkSlice = s[(i * chunkSize):]
 		}
+
+		callback(chunkSlice, i)
+
+		chunkedSlice = append(chunkedSlice, chunkSlice)
 	}
 
 	return chunkedSlice
@@ -115,4 +118,23 @@ func Last[T interface{}](s []T) T {
 
 func Merge[T interface{}](s1 []T, s2 []T) []T {
 	return append(s1, s2...)
+}
+
+func Clear[T interface{}](s []T) []T {
+	s = make([]T, 0)
+
+	return s
+}
+
+func Reverse[T interface{}](s []T) []T {
+	reverse := make([]T, 0)
+	for i := len(s) - 1; i >= 0; i-- {
+		reverse = append(reverse, s[i])
+	}
+
+	return reverse
+}
+
+func Slice[T interface{}](s []T, start int, end int) []T {
+	return s[start:end]
 }

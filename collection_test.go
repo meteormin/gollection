@@ -23,6 +23,27 @@ func TestBaseCollection_Items(t *testing.T) {
 	}
 }
 
+func TestBaseCollection_All(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+
+	all := collection.All()
+
+	for i, v := range all {
+		log.Print(i, v)
+		if v != testData[i] {
+			t.Errorf("not match! %d:%d", i, v)
+		}
+	}
+}
+
+func TestBaseCollection_Count(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+
+	if len(testData) != collection.Count() {
+		t.Errorf("diff count... test: %d, collection: %d", len(testData), collection.Count())
+	}
+}
+
 func TestBaseCollection_Add(t *testing.T) {
 	var collection = gollection.NewCollection(testData)
 
@@ -114,11 +135,111 @@ func TestBaseCollection_Map(t *testing.T) {
 
 func TestBaseCollection_Remove(t *testing.T) {
 	var collection = gollection.NewCollection(testData)
-	collection.Remove(0)
+	err := collection.Remove(0)
+	if err != nil {
+		t.Error(err)
+	}
+
 	collection.For(func(v int, i int) {
 		log.Print(i, v)
 		if v == 1 {
 			t.Error("not removed")
 		}
 	})
+}
+
+func TestBaseCollection_First(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+	first, err := collection.First()
+	if err != nil {
+		t.Error(err)
+	}
+	log.Print(*first)
+}
+
+func TestBaseCollection_IsEmpty(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+	if collection.IsEmpty() {
+		t.Error("test data is not empty!")
+	}
+
+}
+
+func TestBaseCollection_Last(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+	last, err := collection.Last()
+	if err != nil {
+		t.Error(err)
+	}
+	log.Print(*last)
+}
+
+func TestBaseCollection_Merge(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+	merge := []int{4, 5, 6}
+	mergeCollection := collection.Merge(merge)
+
+	if mergeCollection.Count() != 6 {
+		t.Error("failed merge...")
+	}
+
+	mergeCollection.For(func(v int, i int) {
+		log.Print(v)
+	})
+}
+
+func TestBaseCollection_Pop(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+	pop, err := collection.Pop()
+	if err != nil {
+		t.Error(err)
+	}
+	log.Print(*pop)
+}
+
+func TestBaseCollection_Push(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+	collection.Push(4)
+	last, err := collection.Last()
+	if err != nil {
+		t.Error(err)
+	}
+
+	log.Print(*last)
+}
+
+func TestBaseCollection_Copy(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+	collection.Push(4)
+	l, err := collection.Last()
+	if err != nil {
+		t.Error(err)
+	}
+
+	log.Print(*l)
+
+	pop, err := collection.Copy().Pop()
+	if err != nil {
+		t.Error(err)
+	}
+
+	l, err = collection.Last()
+	if err != nil {
+		t.Error(err)
+	}
+
+	log.Print(*pop)
+	log.Print(*l)
+}
+
+func TestBaseCollection_Slice(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+
+	log.Print(collection.Slice(0, 1))
+}
+
+func TestBaseCollection_Reverse(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+
+	log.Print(collection.Reverse())
 }

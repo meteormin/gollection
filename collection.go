@@ -113,7 +113,7 @@ func (b *BaseCollection[T]) Concat(items []T) {
 }
 
 func (b *BaseCollection[T]) Push(item T) {
-	b.Add(item)
+	b.items = slice.Push(b.items, item)
 }
 
 func (b *BaseCollection[T]) Pop() (*T, error) {

@@ -132,7 +132,8 @@ func (b *BaseCollection[T]) First() (*T, error) {
 		return nil, errors.New("this collection is empty")
 	}
 
-	return &b.items[0], nil
+	first := slice.First(b.items)
+	return &first, nil
 }
 
 func (b *BaseCollection[T]) Last() (*T, error) {
@@ -140,11 +141,12 @@ func (b *BaseCollection[T]) Last() (*T, error) {
 		return nil, errors.New("this collection is empty")
 	}
 
-	return &b.items[b.Count()-1], nil
+	last := slice.Last(b.items)
+	return &last, nil
 }
 
 func (b *BaseCollection[T]) Merge(merge []T) Collection[T] {
 	items := b.items
-	items = append(items, merge...)
+	items = slice.Merge(items, merge)
 	return NewCollection(items)
 }

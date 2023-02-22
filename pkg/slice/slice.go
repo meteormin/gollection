@@ -93,3 +93,15 @@ func Concat[T interface{}](s []T, s2 []T) []T {
 
 	return s
 }
+
+func First[T interface{}](s []T) T {
+	return s[0]
+}
+
+func Last[T interface{}](s []T) T {
+	return s[len(s)-1]
+}
+
+func Merge[T interface{}](s1 []T, s2 []T) []T {
+	return append(s1, s2...)
+}

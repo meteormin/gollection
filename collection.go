@@ -121,8 +121,8 @@ func (b *BaseCollection[T]) Pop() (*T, error) {
 		return nil, errors.New("this collection is empty")
 	}
 
-	popItem := b.items[len(b.items)-1]
-	b.items = b.items[:len(b.items)-1]
+	items, popItem := slice.Pop(b.items)
+	b.items = items
 
 	return &popItem, nil
 }

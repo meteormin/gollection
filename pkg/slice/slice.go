@@ -94,6 +94,17 @@ func Concat[T interface{}](s []T, s2 []T) []T {
 	return s
 }
 
+func Push[T interface{}](s []T, i T) []T {
+	return Add(s, i)
+}
+
+func Pop[T interface{}](s []T) (out []T, pop T) {
+	pop = s[len(s)-1]
+	out = s[:len(s)-1]
+
+	return out, pop
+}
+
 func First[T interface{}](s []T) T {
 	return s[0]
 }

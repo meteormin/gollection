@@ -45,39 +45,34 @@ func NewIterator[T interface{}](values []T) Iterator[T] {
 }
 
 type AsyncIterator[T interface{}] interface {
-	Next(fn func(v T, i int) error)
-	Quit()
+	Next() chan T
+	HasNext() bool
+	GetNext() chan T
 }
 
 type StructAsyncIterator[T interface{}] struct {
 	index  int
 	values []T
 	ch     chan T
-	qch    chan bool
-	errs   []error
 }
 
-func (a *StructAsyncIterator[T]) Next(fn func(v T, i int) error) {
-	if len(a.values) <= a.index {
-		a.qch <- true
-	}
-
-	next := a.values[a.index]
-	a.ch <- next
-	select {
-	case n := <-a.ch:
-		err := fn(n, a.index)
-		if err != nil {
-			a.errs[a.index] = err
-		}
-		a.index++
-	case <-a.qch:
-		return
-	}
+func (a *StructAsyncIterator[T]) HasNext() bool {
+	return len(a.values) > a.index
 }
 
-func (a *StructAsyncIterator[T]) Quit() {
-	a.qch <- true
+func (a *StructAsyncIterator[T]) Next() chan T {
+	if !a.HasNext() {
+		return nil
+	}
+
+	a.ch <- a.values[a.index]
+	a.index++
+
+	return a.ch
+}
+
+func (a *StructAsyncIterator[T]) GetNext() chan T {
+	return a.ch
 }
 
 func NewAsyncIterator[T interface{}](values []T) AsyncIterator[T] {
@@ -85,7 +80,5 @@ func NewAsyncIterator[T interface{}](values []T) AsyncIterator[T] {
 		index:  0,
 		values: values,
 		ch:     make(chan T, len(values)),
-		qch:    make(chan bool),
-		errs:   make([]error, len(values)),
 	}
 }

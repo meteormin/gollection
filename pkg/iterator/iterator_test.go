@@ -20,19 +20,17 @@ func TestNewIterator(t *testing.T) {
 }
 
 func TestNewAsyncIterator(t *testing.T) {
-	iter := iterator.NewAsyncIterator(make([]string, 100))
+	iter := iterator.NewAsyncIterator([]int{1, 2, 3, 4, 5})
 
 	go func() {
-		for {
-			iter.Next(func(v string, i int) error {
-				log.Print(v+".", i)
-				time.Sleep(3 * time.Millisecond)
-				return nil
-			})
+		for iter.HasNext() {
+			next := <-iter.Next()
+			time.Sleep(3 * time.Millisecond)
+			log.Print(next)
 		}
 	}()
 
-	for i, v := range make([]string, 100) {
+	for i, v := range make([]string, 5) {
 		log.Print(i, v+".")
 		time.Sleep(3 * time.Millisecond)
 	}

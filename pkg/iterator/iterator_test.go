@@ -24,15 +24,21 @@ func TestNewAsyncIterator(t *testing.T) {
 
 	go func() {
 		for iter.HasNext() {
-			next := <-iter.Next()
-			time.Sleep(3 * time.Millisecond)
-			log.Print(next)
+			go iter.Next()
 		}
 	}()
 
 	for i, v := range make([]string, 5) {
 		log.Print(i, v+".")
 		time.Sleep(3 * time.Millisecond)
+	}
+
+	for {
+		ch := iter.GetNext()
+		if len(ch) == 0 {
+			break
+		}
+		log.Print(<-ch)
 	}
 
 	time.Sleep(3 * time.Second)

@@ -48,12 +48,15 @@ type AsyncIterator[T interface{}] interface {
 	Next() chan T
 	HasNext() bool
 	GetNext() chan T
+	Quit()
+	GetQuitChan() chan bool
 }
 
 type StructAsyncIterator[T interface{}] struct {
 	index  int
 	values []T
 	ch     chan T
+	qch    chan bool
 }
 
 func (a *StructAsyncIterator[T]) HasNext() bool {
@@ -75,10 +78,19 @@ func (a *StructAsyncIterator[T]) GetNext() chan T {
 	return a.ch
 }
 
+func (a *StructAsyncIterator[T]) Quit() {
+	a.qch <- true
+}
+
+func (a *StructAsyncIterator[T]) GetQuitChan() chan bool {
+	return a.qch
+}
+
 func NewAsyncIterator[T interface{}](values []T) AsyncIterator[T] {
 	return &StructAsyncIterator[T]{
 		index:  0,
 		values: values,
 		ch:     make(chan T, len(values)),
+		qch:    make(chan bool),
 	}
 }

@@ -1,7 +1,7 @@
 package slice_test
 
 import (
-	"github.com/miniyus/gofiber/pkg/slice"
+	"github.com/miniyus/gollection/pkg/slice"
 	"log"
 	"testing"
 )
@@ -79,4 +79,81 @@ func TestRemove(t *testing.T) {
 	if rs[0] == 1 {
 		t.Error(rs[0])
 	}
+}
+
+func TestClear(t *testing.T) {
+	testData := []int{1, 2, 3, 4, 5}
+	rs := slice.Clear(testData)
+
+	if len(rs) != 0 {
+		t.Error("failed clear")
+	}
+}
+
+func TestCopy(t *testing.T) {
+	testData := []int{1, 2, 3, 4, 5}
+	rs := slice.Copy(testData)
+
+	if testData[0] != rs[0] {
+		t.Error("failed copy")
+	}
+}
+
+func TestLast(t *testing.T) {
+	testData := []int{1, 2, 3, 4, 5}
+	rs := slice.Last(testData)
+
+	if rs != 5 {
+		t.Error(rs)
+	}
+}
+
+func TestPush(t *testing.T) {
+	testData := []int{1, 2, 3, 4, 5}
+	rs := slice.Push(testData, 1)
+	v := slice.Last(rs)
+	if v != 1 {
+		t.Error(v)
+	}
+}
+
+func TestPop(t *testing.T) {
+	testData := []int{1, 2, 3, 4, 5}
+	_, pop := slice.Pop(testData)
+	if pop != 5 {
+		t.Error(pop)
+	}
+}
+
+func TestFirst(t *testing.T) {
+	testData := []int{1, 2, 3, 4, 5}
+	rs := slice.First(testData)
+
+	if rs != 1 {
+		t.Error(rs)
+	}
+}
+
+func TestReverse(t *testing.T) {
+	testData := []int{1, 2, 3, 4, 5}
+	rs := slice.Reverse(testData)
+
+	if rs[0] != 5 {
+		t.Error(rs)
+	}
+}
+
+func TestMerge(t *testing.T) {
+	testData := []int{1, 2, 3, 4, 5}
+	rs := slice.Merge(testData, []int{4, 3, 2})
+	log.Print(rs)
+	if rs[len(rs)-1] != 2 {
+		t.Error(rs)
+	}
+}
+
+func TestSlice(t *testing.T) {
+	testData := []int{1, 2, 3, 4, 5}
+	rs := slice.Slice(testData, 0, 1)
+	log.Print(rs)
 }

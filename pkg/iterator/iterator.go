@@ -6,6 +6,7 @@ type Iterator[T interface{}] interface {
 	Next() (*T, error)
 	HasNext() bool
 	GetNext() (*T, error)
+	GetIndex() int
 }
 
 type StructIterator[T interface{}] struct {
@@ -37,6 +38,10 @@ func (i *StructIterator[T]) GetNext() (*T, error) {
 	return nil, errors.New("has not next")
 }
 
+func (i *StructIterator[T]) GetIndex() int {
+	return i.index
+}
+
 func NewIterator[T interface{}](values []T) Iterator[T] {
 	return &StructIterator[T]{
 		index:  0,
@@ -50,6 +55,7 @@ type AsyncIterator[T interface{}] interface {
 	GetNext() chan T
 	Quit()
 	GetQuitChan() chan bool
+	GetIndex() int
 }
 
 type StructAsyncIterator[T interface{}] struct {
@@ -65,7 +71,7 @@ func (a *StructAsyncIterator[T]) HasNext() bool {
 
 func (a *StructAsyncIterator[T]) Next() chan T {
 	if !a.HasNext() {
-		return nil
+		return a.ch
 	}
 
 	a.ch <- a.values[a.index]
@@ -84,6 +90,10 @@ func (a *StructAsyncIterator[T]) Quit() {
 
 func (a *StructAsyncIterator[T]) GetQuitChan() chan bool {
 	return a.qch
+}
+
+func (a *StructAsyncIterator[T]) GetIndex() int {
+	return a.index
 }
 
 func NewAsyncIterator[T interface{}](values []T) AsyncIterator[T] {

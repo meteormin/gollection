@@ -9,6 +9,7 @@ import (
 type Collection[T interface{}] interface {
 	Items() []T
 	All() []T
+	Get(key int) T
 	Copy() Collection[T]
 	Count() int
 	IsEmpty() bool
@@ -52,6 +53,10 @@ func (b *BaseCollection[T]) Items() []T {
 // All get All items
 func (b *BaseCollection[T]) All() []T {
 	return slice.Copy(b.items)
+}
+
+func (b *BaseCollection[T]) Get(key int) T {
+	return b.items[key]
 }
 
 func (b *BaseCollection[T]) Copy() Collection[T] {

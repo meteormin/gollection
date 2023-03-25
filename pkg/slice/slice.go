@@ -116,8 +116,14 @@ func Last[T interface{}](s []T) T {
 	return s[len(s)-1]
 }
 
-func Merge[T interface{}](s1 []T, s2 []T) []T {
-	return append(s1, s2...)
+func Merge[T interface{}](s1 []T, s2 ...[]T) []T {
+	merge := s1
+
+	For(s2, func(v []T, i int) {
+		merge = append(merge, v...)
+	})
+
+	return merge
 }
 
 func Clear[T interface{}](s []T) []T {

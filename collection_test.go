@@ -23,6 +23,15 @@ func TestBaseCollection_Items(t *testing.T) {
 	}
 }
 
+func TestBaseCollection_Get(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+	if testData[1] != collection.Get(1) {
+		t.Errorf("test failed: testData(%v) != collectData(%v)", testData[1], collection.Get(1))
+	}
+
+	log.Print(collection.Get(1))
+}
+
 func TestBaseCollection_All(t *testing.T) {
 	var collection = gollection.NewCollection(testData)
 

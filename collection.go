@@ -2,6 +2,8 @@ package gollection
 
 import (
 	"errors"
+	"fmt"
+	"github.com/miniyus/gollection/pkg/maps"
 	"github.com/miniyus/gollection/pkg/slice"
 )
 
@@ -60,7 +62,7 @@ func (b *BaseCollection[T]) Get(key int) T {
 }
 
 func (b *BaseCollection[T]) Copy() Collection[T] {
-	return NewCollection(slice.Copy(b.items))
+	return NewCollection(b.All())
 }
 
 // Count get items count
@@ -164,4 +166,91 @@ func (b *BaseCollection[T]) Slice(start int, end int) Collection[T] {
 
 func (b *BaseCollection[T]) Reverse() Collection[T] {
 	return NewCollection(slice.Reverse(b.All()))
+}
+
+// CollectionMap interface
+type CollectionMap[k comparable, v interface{}] interface {
+	Items() map[k]v
+	All() map[k]v
+	Get(key k) v
+	Copy() CollectionMap[k, v]
+	Count() int
+	IsEmpty() bool
+	Put(key k, item v)
+	Map(fn func(v v, k k) v) CollectionMap[k, v]
+	Filter(fn func(v v, k k) bool) CollectionMap[k, v]
+	Except(fn func(v v, k k) bool) CollectionMap[k, v]
+	For(fn func(v v, k k))
+	Remove(key k) error
+	Merge(merge map[k]v) CollectionMap[k, v]
+}
+
+type BaseCollectionMap[k comparable, v interface{}] struct {
+	items map[k]v
+}
+
+func NewCollectionMap[k comparable, v interface{}](items map[k]v) CollectionMap[k, v] {
+	return BaseCollectionMap[k, v]{
+		items: items,
+	}
+}
+
+func (b BaseCollectionMap[k, v]) Items() map[k]v {
+	return b.items
+}
+
+func (b BaseCollectionMap[k, v]) All() map[k]v {
+	return maps.Copy(b.items)
+}
+
+func (b BaseCollectionMap[k, v]) Get(key k) v {
+	return b.items[key]
+}
+
+func (b BaseCollectionMap[k, v]) Copy() CollectionMap[k, v] {
+	return NewCollectionMap(b.All())
+}
+
+func (b BaseCollectionMap[k, v]) Count() int {
+	return len(b.items)
+}
+
+func (b BaseCollectionMap[k, v]) IsEmpty() bool {
+	return b.Count() == 0
+}
+
+func (b BaseCollectionMap[k, v]) Put(key k, item v) {
+	b.items[key] = item
+}
+
+func (b BaseCollectionMap[k, v]) Map(fn func(v v, k k) v) CollectionMap[k, v] {
+	mapped := maps.Map(b.All(), fn)
+	return NewCollectionMap(mapped)
+}
+
+func (b BaseCollectionMap[k, v]) Filter(fn func(v v, k k) bool) CollectionMap[k, v] {
+	filtered := maps.Filter(b.All(), fn)
+	return NewCollectionMap(filtered)
+}
+
+func (b BaseCollectionMap[k, v]) Except(fn func(v v, k k) bool) CollectionMap[k, v] {
+	excepted := maps.Except(b.All(), fn)
+	return NewCollectionMap(excepted)
+}
+
+func (b BaseCollectionMap[k, v]) For(fn func(v v, k k)) {
+	maps.For(b.items, fn)
+}
+
+func (b BaseCollectionMap[k, v]) Remove(key k) error {
+	if _, ok := b.items[key]; ok {
+		delete(b.items, key)
+		return nil
+	}
+
+	return errors.New(fmt.Sprintf("this map has not key: %v", key))
+}
+
+func (b BaseCollectionMap[k, v]) Merge(merge map[k]v) CollectionMap[k, v] {
+	return NewCollectionMap(maps.Merge(b.All(), merge))
 }

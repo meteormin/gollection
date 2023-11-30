@@ -81,7 +81,7 @@ func TestBaseCollection_Chunk(t *testing.T) {
 
 func TestBaseCollection_Concat(t *testing.T) {
 	var collection = gollection.NewCollection(testData)
-	collection.Concat([]int{4, 5, 6})
+	collection.Concat([]int{4, 5, 6}...)
 
 	resultData := []int{1, 2, 3, 4, 5, 6}
 
@@ -251,4 +251,12 @@ func TestBaseCollection_Reverse(t *testing.T) {
 	var collection = gollection.NewCollection(testData)
 
 	log.Print(collection.Reverse())
+}
+
+func TestBaseCollection_Sort(t *testing.T) {
+	var collection = gollection.NewCollection(testData)
+
+	log.Print(collection.Sort(func(i, j int) bool {
+		return i > j
+	}))
 }

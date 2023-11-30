@@ -9,8 +9,8 @@ func Copy[k comparable, v interface{}](m map[k]v) map[k]v {
 	return copyM
 }
 
-func Map[k comparable, v interface{}](m map[k]v, fn func(value v, key k) v) map[k]v {
-	mapped := make(map[k]v)
+func Map[k comparable, v interface{}, e interface{}](m map[k]v, fn func(value v, key k) e) map[k]e {
+	mapped := make(map[k]e)
 
 	for key, value := range m {
 		mapped[key] = fn(value, key)

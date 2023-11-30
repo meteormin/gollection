@@ -5,31 +5,168 @@ import (
 	"fmt"
 	"github.com/miniyus/gollection/pkg/maps"
 	"github.com/miniyus/gollection/pkg/slice"
+	"sort"
 )
 
 // Collection interface
 type Collection[T interface{}] interface {
+	// Items returns a slice of type T.
+	//
+	// No parameters.
+	// Returns a slice of type T.
 	Items() []T
+
+	// All returns all elements of type T.
+	//
+	// It does not take any parameters.
+	// It returns a slice of type T.
 	All() []T
+
+	// Get retrieves the value associated with the given key.
+	//
+	// Parameters:
+	// - key: an integer representing the key to search for.
+	//
+	// Returns:
+	// - T: the value associated with the key, or the zero value of T if the key is not found.
 	Get(key int) T
+
+	// Copy returns a new Collection with a copy of all the elements.
+	//
+	// Return:
+	// Collection[T] - a new Collection with a copy of all the elements.
 	Copy() Collection[T]
+
+	// Count returns the number of elements in the collection.
+	//
+	// It does not modify the collection.
+	// The return type is int.
 	Count() int
+
+	// IsEmpty checks if the value is empty.
+	//
+	// It returns a boolean value indicating whether the value is empty or not.
 	IsEmpty() bool
+
+	// Add adds an item to the collection.
+	//
+	// item: The item to add.
 	Add(item T)
+
+	// Map applies a given function to each element of the collection and returns a new collection with the results.
+	//
+	// fn: The function to apply to each element of the collection. It takes an element of type T and its index as parameters and returns a value of type T.
+	// Returns: A new collection of type Collection[T] with the results of applying the function to each element.
 	Map(fn func(v T, i int) T) Collection[T]
+
+	// Filter returns a new collection containing the elements that satisfy the given predicate function.
+	//
+	// fn - The predicate function that takes an element of type T and its index and returns a boolean value indicating whether the element should be included in the filtered collection.
+	// Returns a new collection of type Collection[T] containing the elements that satisfy the predicate function.
 	Filter(fn func(v T, i int) bool) Collection[T]
+
+	// Except returns a new collection with all the elements that do not satisfy the provided function.
+	//
+	// fn: A function that takes an element and its index and returns a boolean value indicating whether the element should be excluded from the new collection.
+	// Returns: A new collection containing all the elements that do not satisfy the provided function.
 	Except(fn func(v T, i int) bool) Collection[T]
+
+	// Chunk takes an integer chunkSize and a function fn as parameters. It divides a slice into smaller
+	// chunks of size chunkSize and calls the function fn on each chunk along with its index. It returns
+	// a slice of slices, where each inner slice represents a chunk of the original slice.
+	//
+	// Parameters:
+	// - chunkSize: an integer representing the size of each chunk.
+	// - fn: a function that takes a slice of T and an integer index as parameters.
+	//
+	// Returns:
+	// - [][]T: a slice of slices, where each inner slice represents a chunk of the original slice.
 	Chunk(chunkSize int, fn func(v []T, i int)) [][]T
+
+	// For applies a function to each element of the collection.
+	//
+	// fn: The function to apply to each element.
+	// v: The element of the collection.
+	// i: The index of the element.
 	For(fn func(v T, i int))
+
+	// Remove removes an element at the specified index.
+	//
+	// index: The index of the element to be removed.
+	// error: An error if the removal fails.
 	Remove(index int) error
-	Concat(items []T)
+
+	// Concat concatenates the items of type T into a single string.
+	//
+	// The function takes a variadic parameter `items` of type T, which represents
+	// the items that will be concatenated. The items can be of any type as long
+	// as it is the same type as T.
+	//
+	// The function does not return any values.
+	Concat(items ...T)
+
+	// Push adds an item to the collection.
+	//
+	// item: The item to be added.
 	Push(item T)
+
+	// Pop returns the next element from the stack and removes it.
+	//
+	// It returns a pointer to the element and an error if the stack is empty.
 	Pop() (*T, error)
+
+	// Enqueue adds an item to the queue.
+	//
+	// item: the item to be added to the queue.
+	Enqueue(item T)
+
+	// Dequeue description of the Go function.
+	//
+	// None.
+	// (*T, error).
+	Dequeue() (*T, error)
+
+	// First returns the first element of type T and an error, if any.
+	//
+	// It does not take any parameters.
+	// It returns a pointer to a T and an error.
 	First() (*T, error)
+
+	// Last returns the last element of the T type slice and an error, if any.
+	//
+	// Returns:
+	// - *T: The last element of the slice.
+	// - error: An error, if any.
 	Last() (*T, error)
+
+	// Merge merges the elements of the given slice into the collection.
+	//
+	// merge - the slice to merge into the collection.
+	// Returns a new collection containing the merged elements.
 	Merge(merge []T) Collection[T]
-	Slice(start int, end int) Collection[T]
+
+	// Slice returns a new Collection[T] that is a slice of the current Collection[T].
+	//
+	// It takes two parameters, start and end, which specify the range of elements to include
+	// in the slice. The start parameter is the index of the first element to include, and the
+	// end parameter is the index of the first element to exclude.
+	//
+	// The function returns a new Collection[T] that contains the elements in the specified range.
+	Slice(start, end int) Collection[T]
+
+	// Reverse returns a new collection with the elements in reverse order.
+	//
+	// No parameters.
+	// Returns a Collection[T].
 	Reverse() Collection[T]
+
+	// Sort sorts the elements of the collection using the provided less function.
+	//
+	// The less function should return true if the element at index i should be
+	// positioned before the element at index j in the sorted collection.
+	//
+	// It returns a new sorted collection of the same type.
+	Sort(func(i, j int) bool) Collection[T]
 }
 
 // BaseCollection base collection struct
@@ -52,15 +189,29 @@ func (b *BaseCollection[T]) Items() []T {
 	return b.items
 }
 
-// All get All items
+// All returns a copy of all items in the collection.
+//
+// It takes no parameters.
+// It returns a slice of type T.
 func (b *BaseCollection[T]) All() []T {
 	return slice.Copy(b.items)
 }
 
+// Get retrieves the value associated with the given key from the collection.
+//
+// Parameters:
+// - key: the key used to retrieve the value.
+//
+// Return type:
+// - T: the value associated with the given key.
 func (b *BaseCollection[T]) Get(key int) T {
 	return b.items[key]
 }
 
+// Copy returns a new Collection containing all the elements of the BaseCollection.
+//
+// No parameters.
+// Collection[T]
 func (b *BaseCollection[T]) Copy() Collection[T] {
 	return NewCollection(b.All())
 }
@@ -119,14 +270,20 @@ func (b *BaseCollection[T]) Remove(index int) error {
 }
 
 // Concat items in collection
-func (b *BaseCollection[T]) Concat(items []T) {
+func (b *BaseCollection[T]) Concat(items ...T) {
 	b.items = slice.Concat(b.items, items)
 }
 
+// Push adds an item to the collection.
+//
+// item: the item to be added to the collection.
 func (b *BaseCollection[T]) Push(item T) {
 	b.items = slice.Push(b.items, item)
 }
 
+// Pop removes and returns the last item from the collection.
+//
+// It returns a pointer to the popped item and an error if the collection is empty.
 func (b *BaseCollection[T]) Pop() (*T, error) {
 	if b.IsEmpty() {
 		return nil, errors.New("this collection is empty")
@@ -138,6 +295,30 @@ func (b *BaseCollection[T]) Pop() (*T, error) {
 	return &popItem, nil
 }
 
+// Enqueue adds an item to the collection.
+//
+// item: the item to be added.
+func (b *BaseCollection[T]) Enqueue(item T) {
+	b.items = slice.Enqueue(b.items, item)
+}
+
+// Dequeue removes and returns the first item from the collection.
+//
+// Returns a pointer to the dequeued item and an error if the collection is empty.
+func (b *BaseCollection[T]) Dequeue() (*T, error) {
+	if b.IsEmpty() {
+		return nil, errors.New("this collection is empty")
+	}
+
+	items, deqItem := slice.Dequeue(b.items)
+	b.items = items
+
+	return &deqItem, nil
+}
+
+// First returns the first element in the collection.
+//
+// It returns a pointer to the first element and an error if the collection is empty.
 func (b *BaseCollection[T]) First() (*T, error) {
 	if b.IsEmpty() {
 		return nil, errors.New("this collection is empty")
@@ -147,6 +328,9 @@ func (b *BaseCollection[T]) First() (*T, error) {
 	return &first, nil
 }
 
+// Last returns the last element of the collection.
+//
+// It returns a pointer to the last element and an error if the collection is empty.
 func (b *BaseCollection[T]) Last() (*T, error) {
 	if b.IsEmpty() {
 		return nil, errors.New("this collection is empty")
@@ -156,16 +340,44 @@ func (b *BaseCollection[T]) Last() (*T, error) {
 	return &last, nil
 }
 
+// Merge merges the given slice into the collection and returns a new Collection.
+//
+// merge is a slice of type T that will be merged into the collection.
+// The function returns a Collection of type T.
 func (b *BaseCollection[T]) Merge(merge []T) Collection[T] {
 	return NewCollection(slice.Merge(b.All(), merge))
 }
 
-func (b *BaseCollection[T]) Slice(start int, end int) Collection[T] {
+// Slice returns a new Collection containing the elements from the start index to the end index (exclusive).
+//
+// Parameters:
+// - start: the starting index of the slice.
+// - end: the ending index of the slice.
+//
+// Return type(s):
+// - Collection[T]: a new Collection containing the sliced elements.
+func (b *BaseCollection[T]) Slice(start, end int) Collection[T] {
 	return NewCollection(slice.Slice(b.All(), start, end))
 }
 
+// Reverse returns a new Collection with the elements in reverse order.
+//
+// No parameters.
+// Returns a Collection.
 func (b *BaseCollection[T]) Reverse() Collection[T] {
 	return NewCollection(slice.Reverse(b.All()))
+}
+
+// Sort sorts the collection using the provided comparison function.
+//
+// The comparison function takes two indices as input (i, j) and returns true if the element at index i should be
+// placed before the element at index j in the sorted collection.
+//
+// The function returns a new collection that is sorted according to the provided comparison function.
+func (b *BaseCollection[T]) Sort(fun func(i, j int) bool) Collection[T] {
+	items := b.All()
+	sort.Slice(items, fun)
+	return NewCollection(items)
 }
 
 // CollectionMap interface

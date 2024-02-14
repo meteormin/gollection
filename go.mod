@@ -1,3 +1,3 @@
-module github.com/miniyus/gollection
+module github.com/meteormin/gollection
 
-go 1.20
+go 1.21

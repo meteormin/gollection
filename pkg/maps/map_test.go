@@ -1,7 +1,7 @@
 package maps_test
 
 import (
-	"github.com/miniyus/gollection/pkg/maps"
+	"github.com/meteormin/gollection/pkg/maps"
 	"log"
 	"testing"
 )

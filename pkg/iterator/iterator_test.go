@@ -1,7 +1,7 @@
 package iterator_test
 
 import (
-	"github.com/miniyus/gollection/pkg/iterator"
+	"github.com/meteormin/gollection/pkg/iterator"
 	"log"
 	"testing"
 	"time"

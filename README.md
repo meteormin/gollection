@@ -3,7 +3,7 @@
 ## install
 
 ```shell
-go get miniyus/gollection
+go get meteormin/gollection
 ```
 
 ## usage
@@ -12,7 +12,7 @@ go get miniyus/gollection
 package main
 
 import (
-	"github.com/miniyus/gollection"
+	"github.com/meteormin/gollection"
 	"log"
 )
 

@@ -1,7 +1,7 @@
 package gollection_test
 
 import (
-	"github.com/miniyus/gollection"
+	"github.com/meteormin/gollection"
 	"log"
 	"testing"
 )

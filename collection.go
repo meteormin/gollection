@@ -3,8 +3,8 @@ package gollection
 import (
 	"errors"
 	"fmt"
-	"github.com/miniyus/gollection/pkg/maps"
-	"github.com/miniyus/gollection/pkg/slice"
+	"github.com/meteormin/gollection/pkg/maps"
+	"github.com/meteormin/gollection/pkg/slice"
 	"sort"
 )
 

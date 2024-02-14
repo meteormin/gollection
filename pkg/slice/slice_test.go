@@ -1,7 +1,7 @@
 package slice_test
 
 import (
-	"github.com/miniyus/gollection/pkg/slice"
+	"github.com/meteormin/gollection/pkg/slice"
 	"log"
 	"testing"
 )

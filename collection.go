@@ -1,16 +1,17 @@
 package gollection
 
 import (
-	"errors"
 	"fmt"
+	"sort"
+
 	"github.com/meteormin/gollection/pkg/maps"
 	"github.com/meteormin/gollection/pkg/slice"
-	"sort"
 )
 
 // Collection interface
 type Collection[T interface{}] interface {
 	// Items returns a slice of type T.
+	// returns slice is original slice.
 	//
 	// No parameters.
 	// Returns a slice of type T.
@@ -262,7 +263,7 @@ func (b *BaseCollection[T]) For(fn func(v T, i int)) {
 // Remove item in collection
 func (b *BaseCollection[T]) Remove(index int) error {
 	if b.IsEmpty() {
-		return errors.New("this collection is empty")
+		return CollectionIsEmptyError
 	}
 	b.items = slice.Remove(b.items, index)
 
@@ -286,7 +287,7 @@ func (b *BaseCollection[T]) Push(item T) {
 // It returns a pointer to the popped item and an error if the collection is empty.
 func (b *BaseCollection[T]) Pop() (*T, error) {
 	if b.IsEmpty() {
-		return nil, errors.New("this collection is empty")
+		return nil, CollectionIsEmptyError
 	}
 
 	items, popItem := slice.Pop(b.items)
@@ -307,7 +308,7 @@ func (b *BaseCollection[T]) Enqueue(item T) {
 // Returns a pointer to the dequeued item and an error if the collection is empty.
 func (b *BaseCollection[T]) Dequeue() (*T, error) {
 	if b.IsEmpty() {
-		return nil, errors.New("this collection is empty")
+		return nil, CollectionIsEmptyError
 	}
 
 	items, deqItem := slice.Dequeue(b.items)
@@ -321,7 +322,7 @@ func (b *BaseCollection[T]) Dequeue() (*T, error) {
 // It returns a pointer to the first element and an error if the collection is empty.
 func (b *BaseCollection[T]) First() (*T, error) {
 	if b.IsEmpty() {
-		return nil, errors.New("this collection is empty")
+		return nil, CollectionIsEmptyError
 	}
 
 	first := slice.First(b.All())
@@ -333,7 +334,7 @@ func (b *BaseCollection[T]) First() (*T, error) {
 // It returns a pointer to the last element and an error if the collection is empty.
 func (b *BaseCollection[T]) Last() (*T, error) {
 	if b.IsEmpty() {
-		return nil, errors.New("this collection is empty")
+		return nil, CollectionIsEmptyError
 	}
 
 	last := slice.Last(b.All())
@@ -460,7 +461,7 @@ func (b BaseCollectionMap[k, v]) Remove(key k) error {
 		return nil
 	}
 
-	return errors.New(fmt.Sprintf("this map has not key: %v", key))
+	return fmt.Errorf("this map has not key: %v", key)
 }
 
 func (b BaseCollectionMap[k, v]) Merge(merge map[k]v) CollectionMap[k, v] {

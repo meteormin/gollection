@@ -3,9 +3,10 @@ package gollection
 import (
 	"errors"
 	"fmt"
+	"sort"
+
 	"github.com/meteormin/gollection/pkg/maps"
 	"github.com/meteormin/gollection/pkg/slice"
-	"sort"
 )
 
 // Collection interface
@@ -88,7 +89,16 @@ type Collection[T interface{}] interface {
 	// fn: The function to apply to each element.
 	// v: The element of the collection.
 	// i: The index of the element.
+	//
+	// Deprecated: Use Each instead.
 	For(fn func(v T, i int))
+
+	// Each applies a function to each element of the collection.
+	//
+	// fn: The function to apply to each element.
+	// v: The element of the collection.
+	// i: The index of the element.
+	Each(fn func(v T, i int))
 
 	// Remove removes an element at the specified index.
 	//
@@ -257,6 +267,10 @@ func (b *BaseCollection[T]) Chunk(chunkSize int, fn func(v []T, i int)) [][]T {
 // For loop items in collection
 func (b *BaseCollection[T]) For(fn func(v T, i int)) {
 	slice.For(b.items, fn)
+}
+
+func (b *BaseCollection[T]) Each(fn func(v T, i int)) {
+	slice.Each(b.items, fn)
 }
 
 // Remove item in collection

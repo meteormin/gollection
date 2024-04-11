@@ -1,9 +1,10 @@
 package slice_test
 
 import (
-	"github.com/meteormin/gollection/pkg/slice"
 	"log"
 	"testing"
+
+	"github.com/meteormin/gollection/pkg/slice"
 )
 
 func TestChunk(t *testing.T) {
@@ -23,9 +24,9 @@ func TestConcat(t *testing.T) {
 	}
 }
 
-func TestFor(t *testing.T) {
+func TestEach(t *testing.T) {
 	testData := make([]int, 10)
-	slice.For(testData, func(v int, i int) {
+	slice.Each(testData, func(v int, i int) {
 		if i >= 10 {
 			t.Error(i)
 		}
@@ -39,6 +40,22 @@ func TestMap(t *testing.T) {
 	})
 
 	log.Print(rs)
+}
+
+func TestFlatMap(t *testing.T) {
+	testData := [][]int{
+		{1, 2, 3},
+		{4, 5, 6},
+		{7, 8, 9},
+	}
+
+	rs := slice.FlatMap(testData, func(v []int, i int) []float64 {
+		return slice.Map(v, func(v int, i int) float64 {
+			return float64(v) + float64(v)*0.1
+		})
+	})
+
+	t.Log(rs)
 }
 
 func TestExcept(t *testing.T) {

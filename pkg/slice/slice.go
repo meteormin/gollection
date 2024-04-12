@@ -36,6 +36,16 @@ func Map[T interface{}, E interface{}](s []T, fn func(v T, i int) E) []E {
 	return mapped
 }
 
+func FlatMap[T interface{}, E interface{}](s [][]T, fn func(v []T, i int) []E) []E {
+	var mapped []E
+
+	for i, v := range s {
+		mapped = append(mapped, fn(v, i)...)
+	}
+
+	return mapped
+}
+
 // Filter filters a slice of elements based on a given predicate function.
 //
 // The function takes a slice, `s`, of elements of any type, `T`, and a predicate function, `fn`.
@@ -102,9 +112,10 @@ func Except[T interface{}](s []T, fn func(v T, i int) bool) []T {
 // Returns:
 // - chunkedSlice: a 2D slice containing the chunked sub-slices.
 func Chunk[T interface{}](s []T, chunkSize int, fn ...func(v []T, i int)) [][]T {
-	chunkSlice := make([]T, 0)
+	var chunkSlice []T
+
 	chunkedSlice := make([][]T, 0)
-	chunkedSize := int(math.Ceil(float64(len(s) / chunkSize)))
+	chunkedSize := int(math.Ceil(float64(len(s)) / float64(chunkSize)))
 
 	var callback func(v []T, i int)
 	if len(fn) != 0 {
@@ -134,7 +145,23 @@ func Chunk[T interface{}](s []T, chunkSize int, fn ...func(v []T, i int)) [][]T 
 //
 // Return:
 //   - []T: The original slice s.
+//
+// Deprected: Use the Each function instead.
 func For[T interface{}](s []T, fn func(v T, i int)) []T {
+	for i, v := range s {
+		fn(v, i)
+	}
+
+	return s
+}
+
+// Each applies a function to each element of a slice.
+//
+// Parameters:
+// - s: the slice to iterate over
+// - fn: the function to apply to each element of the slice
+// Returns the modified slice.
+func Each[T interface{}](s []T, fn func(v T, i int)) []T {
 	for i, v := range s {
 		fn(v, i)
 	}
@@ -170,9 +197,7 @@ func Concat[T interface{}](s []T, s2 []T) []T {
 		return s
 	}
 
-	for _, v := range s2 {
-		s = append(s, v)
-	}
+	s = append(s, s2...)
 
 	return s
 }
@@ -263,8 +288,7 @@ func Merge[T interface{}](s1 []T, s2 ...[]T) []T {
 //
 // It takes a slice s as input and returns a new empty slice of type T.
 func Clear[T interface{}](s []T) []T {
-	s = make([]T, 0)
-
+	clear(s)
 	return s
 }
 

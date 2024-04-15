@@ -36,7 +36,7 @@ func Map[T interface{}, E interface{}](s []T, fn func(v T, i int) E) []E {
 	return mapped
 }
 
-func FlatMap[T interface{}, E interface{}](s [][]T, fn func(v []T, i int) []E) []E {
+func FlatMap[T interface{}, E interface{}](s []T, fn func(v T, i int) []E) []E {
 	var mapped []E
 
 	for i, v := range s {

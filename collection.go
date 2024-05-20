@@ -53,7 +53,7 @@ type Collection[T interface{}] interface {
 	Filter(fn func(v T) bool) Collection[T]
 
 	// Get returns the first item that satisfies the given predicate function
-	Get(index int) T
+	Get(index int) (*T, error)
 
 	// Find returns the first item that satisfies the given predicate function
 	Insert(index int, item T) Collection[T]
@@ -193,8 +193,22 @@ func (b *BaseCollection[T]) First() (*T, error) {
 	return &first, nil
 }
 
-func (b *BaseCollection[T]) Get(index int) T {
-	return b.items[index]
+// Get retrieves the element at the specified index from the BaseCollection.
+//
+// Parameters:
+// - index: the index of the element to retrieve.
+//
+// Returns:
+// - *T: a pointer to the element at the specified index.
+// - error: an error if the index is out of range.
+func (b *BaseCollection[T]) Get(index int) (*T, error) {
+	if b.Count()-1 < index {
+		return nil, ErrIndexOutOfRange
+	}
+
+	get := b.items[index]
+
+	return &get, nil
 }
 
 // Insert inserts a value at the specified index in the BaseCollection and returns the modified Collection.

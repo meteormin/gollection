@@ -26,8 +26,21 @@ func TestBaseCollection_Items(t *testing.T) {
 
 func TestBaseCollection_Get(t *testing.T) {
 	collection := gollection.NewCollection(testData)
-	if testData[1] != collection.Get(1) {
-		t.Errorf("test failed: testData(%v) != collectData(%v)", testData[1], collection.Get(1))
+	get, _ := collection.Get(1)
+
+	if get == nil {
+		t.Error("test failed get is nil")
+		return
+	}
+
+	tGet, _ := collection.Get(1)
+	if tGet == get {
+		t.Errorf("test failed: testData(%v) == collectData(%v)", tGet, get)
+		return
+	}
+
+	if testData[1] != *get {
+		t.Errorf("test failed: testData(%v) != collectData(%v)", testData[1], *get)
 	}
 
 	log.Print(collection.Get(1))

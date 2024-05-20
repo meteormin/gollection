@@ -52,6 +52,9 @@ type Collection[T interface{}] interface {
 	// Filter returns a new collection with items that satisfy the given predicate function
 	Filter(fn func(v T) bool) Collection[T]
 
+	// Get returns the first item that satisfies the given predicate function
+	Get(index int) T
+
 	// Find returns the first item that satisfies the given predicate function
 	Insert(index int, item T) Collection[T]
 
@@ -188,6 +191,10 @@ func (b *BaseCollection[T]) First() (*T, error) {
 
 	first := slice.First(b.All())
 	return &first, nil
+}
+
+func (b *BaseCollection[T]) Get(index int) T {
+	return b.items[index]
 }
 
 // Insert inserts a value at the specified index in the BaseCollection and returns the modified Collection.

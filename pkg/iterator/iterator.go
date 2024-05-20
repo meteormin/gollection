@@ -24,10 +24,7 @@ func (i *StructIterator[T]) Next() (*T, error) {
 }
 
 func (i *StructIterator[T]) HasNext() bool {
-	if i.index < len(i.values) {
-		return true
-	}
-	return false
+	return i.index < len(i.values)
 }
 
 func (i *StructIterator[T]) GetNext() (*T, error) {

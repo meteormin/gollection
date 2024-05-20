@@ -8,10 +8,10 @@ import (
 )
 
 func TestChunk(t *testing.T) {
-	testData := make([]int, 12)
-	slice.Chunk(testData, 2, func(v []int, i int) {
+	testData := make([]int, 10)
+	slice.Chunk(testData, 2, func(v []int) {
 		if len(v) != 2 {
-			t.Error(len(v), i)
+			t.Error(len(v))
 		}
 	})
 }
@@ -26,17 +26,17 @@ func TestConcat(t *testing.T) {
 
 func TestEach(t *testing.T) {
 	testData := make([]int, 10)
-	slice.Each(testData, func(v int, i int) {
-		if i >= 10 {
-			t.Error(i)
+	slice.Each(testData, func(v int) {
+		if v >= 10 {
+			t.Error(v)
 		}
 	})
 }
 
 func TestMap(t *testing.T) {
 	testData := make([]int, 10)
-	rs := slice.Map(testData, func(v int, i int) int {
-		return i + 1
+	rs := slice.Map(testData, func(v int) int {
+		return v + 1
 	})
 
 	log.Print(rs)
@@ -49,8 +49,8 @@ func TestFlatMap(t *testing.T) {
 		{7, 8, 9},
 	}
 
-	rs := slice.FlatMap(testData, func(v []int, i int) []float64 {
-		return slice.Map(v, func(v int, i int) float64 {
+	rs := slice.FlatMap(testData, func(v []int) []float64 {
+		return slice.Map(v, func(v int) float64 {
 			return float64(v) + float64(v)*0.1
 		})
 	})
@@ -58,20 +58,9 @@ func TestFlatMap(t *testing.T) {
 	t.Log(rs)
 }
 
-func TestExcept(t *testing.T) {
-	testData := []int{1, 2, 3, 4, 5}
-	rs := slice.Except(testData, func(v int, i int) bool {
-		return v == 1
-	})
-
-	if rs[0] == 1 {
-		t.Error(rs[0])
-	}
-}
-
 func TestFilter(t *testing.T) {
 	testData := []int{1, 2, 3, 4, 5}
-	rs := slice.Filter(testData, func(v int, i int) bool {
+	rs := slice.Filter(testData, func(v int) bool {
 		return v == 1
 	})
 

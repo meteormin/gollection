@@ -1,9 +1,10 @@
 package maps_test
 
 import (
-	"github.com/meteormin/gollection/pkg/maps"
 	"log"
 	"testing"
+
+	"github.com/meteormin/gollection/pkg/maps"
 )
 
 func TestCopy(t *testing.T) {
@@ -17,19 +18,8 @@ func TestMap(t *testing.T) {
 	m := make(map[string]int)
 	m["a"] = 1
 	m["b"] = 2
-	mapped := maps.Map(m, func(value int, key string) int {
+	mapped := maps.Map(m, func(value int) int {
 		return value + 1
-	})
-
-	log.Print(mapped)
-}
-
-func TestFor(t *testing.T) {
-	m := make(map[string]int)
-	m["a"] = 1
-	m["b"] = 2
-	mapped := maps.For(m, func(value int, key string) {
-		log.Print(key, value)
 	})
 
 	log.Print(mapped)
@@ -39,21 +29,9 @@ func TestFilter(t *testing.T) {
 	m := make(map[string]int)
 	m["a"] = 1
 	m["b"] = 2
-	mapped := maps.Filter(m, func(value int, key string) bool {
-		log.Print(key, value)
-		return key == "a"
-	})
-
-	log.Print(mapped)
-}
-
-func TestExcept(t *testing.T) {
-	m := make(map[string]int)
-	m["a"] = 1
-	m["b"] = 2
-	mapped := maps.Except(m, func(value int, key string) bool {
-		log.Print(key, value)
-		return key == "a"
+	mapped := maps.Filter(m, func(value int) bool {
+		log.Print(value)
+		return value == 1
 	})
 
 	log.Print(mapped)

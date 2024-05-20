@@ -1,9 +1,10 @@
 package gollection_test
 
 import (
-	"github.com/meteormin/gollection"
 	"log"
 	"testing"
+
+	"github.com/meteormin/gollection"
 )
 
 var testData = []int{
@@ -11,7 +12,7 @@ var testData = []int{
 }
 
 func TestBaseCollection_Items(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 
 	items := collection.Items()
 
@@ -24,7 +25,7 @@ func TestBaseCollection_Items(t *testing.T) {
 }
 
 func TestBaseCollection_Get(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	if testData[1] != collection.Get(1) {
 		t.Errorf("test failed: testData(%v) != collectData(%v)", testData[1], collection.Get(1))
 	}
@@ -33,7 +34,7 @@ func TestBaseCollection_Get(t *testing.T) {
 }
 
 func TestBaseCollection_All(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 
 	all := collection.All()
 
@@ -46,7 +47,7 @@ func TestBaseCollection_All(t *testing.T) {
 }
 
 func TestBaseCollection_Count(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 
 	if len(testData) != collection.Count() {
 		t.Errorf("diff count... test: %d, collection: %d", len(testData), collection.Count())
@@ -54,7 +55,7 @@ func TestBaseCollection_Count(t *testing.T) {
 }
 
 func TestBaseCollection_Add(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 
 	collection.Add(4)
 	i := collection.Items()
@@ -64,14 +65,13 @@ func TestBaseCollection_Add(t *testing.T) {
 	if 4 != i[len(i)-1] {
 		t.Error("result must be 4")
 	}
-
 }
 
 func TestBaseCollection_Chunk(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 
-	chunked := collection.Chunk(1, func(n []int, i int) {
-		log.Print(n, i)
+	chunked := collection.Chunk(1, func(n []int) {
+		log.Print(n)
 	})
 
 	if len(chunked) != len(testData) {
@@ -80,7 +80,7 @@ func TestBaseCollection_Chunk(t *testing.T) {
 }
 
 func TestBaseCollection_Concat(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	collection.Concat([]int{4, 5, 6}...)
 
 	resultData := []int{1, 2, 3, 4, 5, 6}
@@ -93,22 +93,9 @@ func TestBaseCollection_Concat(t *testing.T) {
 	}
 }
 
-func TestBaseCollection_Except(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
-	result := collection.Except(func(v int, i int) bool {
-		return v == 1
-	})
-
-	for _, n := range result.Items() {
-		if n == 1 {
-			t.Error("FAIL!")
-		}
-	}
-}
-
 func TestBaseCollection_Filter(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
-	resultCollection := collection.Filter(func(v int, i int) bool {
+	collection := gollection.NewCollection(testData)
+	resultCollection := collection.Filter(func(v int) bool {
 		return v == 1
 	})
 
@@ -119,19 +106,10 @@ func TestBaseCollection_Filter(t *testing.T) {
 	}
 }
 
-func TestBaseCollection_For(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
-	collection.For(func(v int, i int) {
-		if v != testData[i] {
-			t.Error("FAIL!")
-		}
-	})
-}
-
 func TestBaseCollection_Map(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
-	result := collection.Map(func(v int, i int) int {
-		return i + 1
+	collection := gollection.NewCollection(testData)
+	result := collection.Map(func(v int) int {
+		return v + 1
 	})
 
 	for i, n := range result.Items() {
@@ -143,14 +121,14 @@ func TestBaseCollection_Map(t *testing.T) {
 }
 
 func TestBaseCollection_Remove(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	err := collection.Remove(0)
 	if err != nil {
 		t.Error(err)
 	}
 
-	collection.For(func(v int, i int) {
-		log.Print(i, v)
+	collection.Each(func(v int) {
+		log.Print(v)
 		if v == 1 {
 			t.Error("not removed")
 		}
@@ -158,7 +136,7 @@ func TestBaseCollection_Remove(t *testing.T) {
 }
 
 func TestBaseCollection_First(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	first, err := collection.First()
 	if err != nil {
 		t.Error(err)
@@ -167,15 +145,14 @@ func TestBaseCollection_First(t *testing.T) {
 }
 
 func TestBaseCollection_IsEmpty(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	if collection.IsEmpty() {
 		t.Error("test data is not empty!")
 	}
-
 }
 
 func TestBaseCollection_Last(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	last, err := collection.Last()
 	if err != nil {
 		t.Error(err)
@@ -184,7 +161,7 @@ func TestBaseCollection_Last(t *testing.T) {
 }
 
 func TestBaseCollection_Merge(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	merge := []int{4, 5, 6}
 	mergeCollection := collection.Merge(merge)
 
@@ -192,13 +169,13 @@ func TestBaseCollection_Merge(t *testing.T) {
 		t.Error("failed merge...")
 	}
 
-	mergeCollection.For(func(v int, i int) {
+	mergeCollection.Each(func(v int) {
 		log.Print(v)
 	})
 }
 
 func TestBaseCollection_Pop(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	pop, err := collection.Pop()
 	if err != nil {
 		t.Error(err)
@@ -207,7 +184,7 @@ func TestBaseCollection_Pop(t *testing.T) {
 }
 
 func TestBaseCollection_Push(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	collection.Push(4)
 	last, err := collection.Last()
 	if err != nil {
@@ -218,7 +195,7 @@ func TestBaseCollection_Push(t *testing.T) {
 }
 
 func TestBaseCollection_Copy(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 	collection.Push(4)
 	l, err := collection.Last()
 	if err != nil {
@@ -242,19 +219,19 @@ func TestBaseCollection_Copy(t *testing.T) {
 }
 
 func TestBaseCollection_Slice(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 
 	log.Print(collection.Slice(0, 1))
 }
 
 func TestBaseCollection_Reverse(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 
 	log.Print(collection.Reverse())
 }
 
 func TestBaseCollection_Sort(t *testing.T) {
-	var collection = gollection.NewCollection(testData)
+	collection := gollection.NewCollection(testData)
 
 	log.Print(collection.Sort(func(i, j int) bool {
 		return i > j

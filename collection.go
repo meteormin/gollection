@@ -85,6 +85,9 @@ type Collection[T interface{}] interface {
 	// Push adds an item to the collection
 	Push(item T)
 
+	// Remove removes an item from the collection
+	Remove(index int) error
+
 	// Reverse returns a new collection with the items in reverse order
 	Reverse() Collection[T]
 
@@ -254,6 +257,16 @@ func (b *BaseCollection[T]) Pop() (*T, error) {
 // Push adds an item to the collection.
 func (b *BaseCollection[T]) Push(item T) {
 	b.items = slice.Push(b.items, item)
+}
+
+func (b *BaseCollection[T]) Remove(i int) error {
+	if b.IsEmpty() {
+		return ErrIsEmpty
+	}
+
+	b.items = slice.Remove(b.items, i)
+
+	return nil
 }
 
 // Reverse returns a new Collection with the elements in reverse order.

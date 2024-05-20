@@ -233,7 +233,13 @@ func TestBaseCollection_Reverse(t *testing.T) {
 func TestBaseCollection_Sort(t *testing.T) {
 	collection := gollection.NewCollection(testData)
 
-	log.Print(collection.Sort(func(i, j int) bool {
-		return i > j
+	log.Print(collection.Sort(func(i, j int) int {
+		if i == j {
+			return 0
+		} else if i < j {
+			return 1
+		} else {
+			return -1
+		}
 	}))
 }
